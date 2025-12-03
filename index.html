@@ -35,6 +35,9 @@
             text-align: center;
             border-top: 10px solid var(--primary-color);
             position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 500px; /* Garante altura mínima para consistência */
         }
 
         /* CABEÇALHO COM BOTÃO MULTIMÉDIA */
@@ -280,6 +283,16 @@
             background: #fff;
             margin-top: 20px;
         }
+
+        /* RODAPÉ */
+        .app-footer {
+            margin-top: auto; /* Empurra o rodapé para o fundo */
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 0.85rem;
+            color: #95a5a6;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -413,6 +426,11 @@
                 <p><small id="final-date"></small></p>
             </div>
             <button class="btn" onclick="location.reload()">🔄 Voltar ao Início</button>
+        </div>
+
+        <!-- RODAPÉ -->
+        <div class="app-footer">
+            Teodósio Faria © 2025 A Viagem do Natal
         </div>
     </div>
 
