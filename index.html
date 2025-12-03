@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Viagem do Natal - Versão Final</title>
+    <style>
+        :root {
+            --primary-color: #c0392b;
+            --secondary-color: #27ae60;
+            --accent-color: #f1c40f;
+            --bg-color: #f4f6f7;
+            --text-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            border-top: 10px solid var(--primary-color);
+            position: relative;
+        }
+
+        /* CABEÇALHO COM BOTÃO MULTIMÉDIA */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .media-btn-global {
+            background-color: var(--accent-color);
+            color: #d35400;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .media-btn-global:hover {
+            transform: scale(1.05);
+            background-color: #f39c12;
+        }
+
+        input {
+            padding: 12px;
+            font-size: 1.1rem;
+            margin: 10px 0;
+            width: 70%;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input.error {
+            border-color: red;
+            background-color: #ffe6e6;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        .btn:hover { background-color: #a93226; transform: translateY(-2px); }
+        .btn-secondary { background-color: var(--secondary-color); }
+        .btn-secondary:hover { background-color: #219150; }
+        
+        .btn-blue { background-color: #3498db; }
+        .btn-blue:hover { background-color: #2980b9; }
+
+        .hidden { display: none !important; }
+
+        /* ESTILOS DO QUIZ */
+        .option-btn {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 15px;
+            background: #f8f9f9;
+            border: 2px solid #ddd;
+            text-align: left;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 5px;
+        }
+        .option-btn:hover { background-color: #e8e8e8; }
+        .option-btn.correct { background: #d4efdf; border-color: var(--secondary-color); font-weight: bold;}
+        .option-btn.wrong { background: #fadbd8; border-color: var(--primary-color); opacity: 0.7; }
+
+        .curiosity-box {
+            background-color: #fef9e7;
+            border-left: 5px solid var(--accent-color);
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            line-height: 1.6;
+        }
+
+        .game-image {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 8px;
+            margin: 15px 0;
+            object-fit: contain;
+            background-color: #eee;
+            cursor: zoom-in;
+            transition: transform 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .game-image:hover {
+            transform: scale(1.02);
+            border-color: var(--accent-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* ESTILOS DOS FLASHCARDS */
+        .flashcard-container {
+            perspective: 1000px;
+            width: 100%;
+            height: 300px;
+            margin: 20px auto;
+            cursor: pointer;
+        }
+
+        .flashcard {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 15px;
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-radius: 15px;
+            box-sizing: border-box;
+            flex-direction: column;
+        }
+
+        .flashcard-front {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            border: 2px solid #bdc3c7;
+        }
+
+        .flashcard-back {
+            background-color: var(--secondary-color);
+            color: white;
+            transform: rotateY(180deg);
+            border: 2px solid #2ecc71;
+        }
+
+        .flashcard-text {
+            font-size: 1.2rem;
+            line-height: 1.5;
+        }
+
+        .flashcard-hint {
+            font-size: 0.8rem;
+            margin-top: 15px;
+            color: #7f8c8d;
+        }
+        
+        .flashcard-back .flashcard-hint {
+            color: #d4efdf;
+        }
+
+        /* MODAL GERAL (Zoom e Multimédia) */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 2000; 
+            padding-top: 50px; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.9); 
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 900px;
+            border-radius: 8px;
+            animation-name: zoom;
+            animation-duration: 0.3s;
+        }
+        
+        /* Modal Multimédia Específico */
+        .media-modal-content {
+            background: white;
+            padding: 20px;
+            width: 90%;
+            max-width: 600px;
+            margin: 100px auto;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        @keyframes zoom { from {transform:scale(0)} to {transform:scale(1)} }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+            z-index: 2001;
+        }
+        
+        .close-media {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+        .close-media:hover { color: black; }
+
+        /* Certificado */
+        .certificate {
+            border: 10px double var(--accent-color);
+            padding: 30px;
+            background: #fff;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Modal de Zoom de Imagem -->
+    <div id="zoom-modal" class="modal">
+        <span class="close" onclick="closeZoom()">&times;</span>
+        <img class="modal-content" id="img-in-modal">
+        <div id="caption" style="color:white; text-align:center; padding:10px;"></div>
+    </div>
+
+    <!-- Modal Multimédia (Acessível de qualquer lugar) -->
+    <div id="media-modal" class="modal">
+        <div class="media-modal-content">
+            <span class="close-media" onclick="closeMediaModal()">&times;</span>
+            <h2 style="color: var(--primary-color); margin-top:0;">🎬 Recursos Multimédia</h2>
+            <hr>
+            
+            <div style="margin-bottom: 20px;">
+                <h4>📺 Vídeo: A História do Natal</h4>
+                <video id="global-video" controls width="100%" style="border-radius: 8px; background: #000; max-height:300px;">
+                    <source src="./A_Historia_do_Natal.mp4" type="video/mp4">
+                    O teu navegador não suporta vídeo.
+                </video>
+            </div>
+
+            <div>
+                <h4>🎧 Podcast: Curiosidades</h4>
+                <audio id="global-audio" controls style="width: 100%;">
+                    <source src="./A_Historia_do_Natal.mp3" type="audio/mpeg">
+                    O teu navegador não suporta áudio.
+                </audio>
+            </div>
+            <p style="font-size: 0.8rem; color: gray; margin-top: 10px;">Nota: Podes fechar esta janela e voltar a qualquer momento.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Cabeçalho Global -->
+        <div class="app-header">
+            <h2 style="margin:0; color:var(--primary-color);">🎅 A Viagem do Natal</h2>
+            <button class="media-btn-global" onclick="openMediaModal()">
+                <span>🎥 Multimédia</span>
+            </button>
+        </div>
+
+        <!-- Ecrã Inicial -->
+        <div id="start-screen">
+            <h1>Bem-vindo, explorador! 🌍</h1>
+            <p>Digita o teu nome para começar:</p>
+            
+            <input type="text" id="username" placeholder="O teu nome aqui...">
+            <br>
+            <span id="error-msg" style="color: red; display: none;">⚠️ Por favor, escreve o teu nome primeiro!</span>
+            <br><br>
+
+            <h3>O que queres fazer hoje?</h3>
+            
+            <!-- Novos Botões de Atividade -->
+            <button id="btn-flashcards" class="btn btn-blue" style="width: 80%;">📚 Flashcards de Estudo<br><small>(Rever matéria)</small></button>
+            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+                <button id="btn-explorer" class="btn btn-secondary" style="flex:1;">🧭 Modo Explorador</button>
+                <button id="btn-challenge" class="btn" style="flex:1;">⚡ Modo Desafio</button>
+            </div>
+        </div>
+
+        <!-- Ecrã Flashcards -->
+        <div id="flashcard-screen" class="hidden">
+            <h3>📚 Flashcards: Revisão Rápida</h3>
+            <p style="font-size: 0.9rem; color: #7f8c8d;">Clica no cartão para virar. Usa os botões para navegar.</p>
+            
+            <div class="flashcard-container" onclick="flipCard()">
+                <div class="flashcard" id="flashcard">
+                    <div class="flashcard-front">
+                        <div class="flashcard-text" id="fc-question">Pergunta aqui...</div>
+                        <div class="flashcard-hint">Clica para ver a resposta ↺</div>
+                    </div>
+                    <div class="flashcard-back">
+                        <div class="flashcard-text" id="fc-answer">Resposta aqui...</div>
+                        <div class="flashcard-hint">Clica para ver a pergunta ↺</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <button class="btn btn-secondary" onclick="prevCard()">⬅️ Anterior</button>
+                <span id="fc-counter" style="font-weight: bold; color: #7f8c8d;">1 / 10</span>
+                <button class="btn btn-secondary" onclick="nextCard()">Próximo ➡️</button>
+            </div>
+            <button class="btn" style="margin-top: 20px; background-color: #95a5a6;" onclick="backToMenu()">🏠 Voltar ao Menu</button>
+        </div>
+
+        <!-- Ecrã de Jogo (Quiz) -->
+        <div id="game-screen" class="hidden">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span id="module-display" style="font-weight: bold; color: var(--secondary-color);">Módulo</span>
+                <span>Pontos: <span id="score-display">0</span></span>
+            </div>
+            
+            <div style="background:#ddd; height:10px; border-radius:5px; margin-bottom:20px;">
+                <div id="progress-fill" style="background:var(--secondary-color); height:100%; width:0%; border-radius:5px; transition:0.3s;"></div>
+            </div>
+
+            <div style="position: relative;">
+                <img id="step-image" alt="Imagem do desafio" class="game-image hidden" onclick="openZoom(this)">
+                <div style="text-align: center; font-size: 0.8rem; color: #95a5a6; margin-top: -10px; margin-bottom: 15px;">(Clica na imagem para ampliar 🔍)</div>
+            </div>
+            <p id="image-placeholder" class="hidden" style="color: #7f8c8d; font-size: 0.8rem;">(Imagem não encontrada, mas vamos continuar!)</p>
+
+            <div id="curiosity-panel" class="curiosity-box hidden">
+                <h3>💡 Sabias que?</h3>
+                <p id="curiosity-text"></p>
+                <button id="btn-continue" class="btn">Continuar ➡️</button>
+                <button id="btn-next-step" class="btn hidden">Próxima Etapa ✈️</button>
+            </div>
+
+            <div id="question-panel" class="hidden">
+                <h2 id="question-text"></h2>
+                <div id="options-container"></div>
+            </div>
+        </div>
+
+        <!-- Ecrã Final -->
+        <div id="end-screen" class="hidden">
+            <div class="certificate">
+                <h1 style="color: var(--primary-color);">🏆 Certificado</h1>
+                <p>Certificamos que</p>
+                <h2 id="final-name" style="font-size: 2rem;">Aluno</h2>
+                <p>Completou a viagem com <strong id="final-score">0</strong> pontos.</p>
+                <p>Classificação: <strong id="final-rank">Aprendiz</strong></p>
+                <p><small id="final-date"></small></p>
+            </div>
+            <button class="btn" onclick="location.reload()">🔄 Voltar ao Início</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DADOS DOS FLASHCARDS (Extraídos do CSV) ---
+        const flashcardsData = [
+            { q: "Qual festividade pagã romana é associada à origem da troca de presentes no Natal?", a: "A Saturnália (homenagem ao deus Saturno)." },
+            { q: "A celebração romana 'Natalis Solis Invicti' simbolizava Cristo como o quê?", a: "A Luz do Mundo." },
+            { q: "Qual Papa fixou oficialmente o Natal a 25 de dezembro no século IV?", a: "O Papa Júlio I." },
+            { q: "Que imperador declarou o Natal como feriado oficial em 529 d.C.?", a: "O Imperador Justiniano." },
+            { q: "Quem criou o primeiro presépio em Greccio (1223)?", a: "São Francisco de Assis." },
+            { q: "Qual era o objetivo de São Francisco ao criar o presépio?", a: "Tornar a humildade do nascimento de Jesus visível e palpável." },
+            { q: "O que significa literalmente a palavra latina 'praesepe'?", a: "Estábulo ou manjedoura." },
+            { q: "A origem do Bolo-Rei está associada a que festejos romanos?", a: "Saturnália." },
+            { q: "Como se chamou o Bolo-Rei após a implantação da República em 1910?", a: "Bolo Nacional." },
+            { q: "Qual a bebida tradicional de Natal nos EUA feita com ovos e leite?", a: "Eggnog." },
+            { q: "No Brasil, como se chama a troca de presentes secreta?", a: "Amigo Secreto (ou Oculto)." },
+            { q: "Que cidade australiana tem uma árvore decorada com cristais Swarovski?", a: "Sydney." }
+        ];
+
+        // --- DADOS DO QUIZ ---
+        const timelineData = [
+            {
+                modulo: "Origens Antigas",
+                curiosidade: "Os romanos celebravam a Saturnália em dezembro. Eram dias de festa onde as normas sociais se invertiam, as casas eram decoradas e trocavam-se presentes.",
+                pergunta: "Que festa romana antiga influenciou a troca de presentes no Natal?",
+                opcoes: ["Lupercália", "Saturnália", "Florália", "Solstício"],
+                respostaCorreta: 1,
+                imagem: "./image1.jpg"
+            },
+            {
+                modulo: "Origens Antigas",
+                curiosidade: "A data de 25 de dezembro foi oficializada pelo Papa Júlio I no século IV. Coincidia com o 'Sol Invictus', facilitando a aceitação pelo povo.",
+                pergunta: "Quem foi o Papa responsável por fixar o dia 25 de dezembro?",
+                opcoes: ["Papa Pedro", "Papa Leão I", "Papa Júlio I", "Papa Francisco"],
+                respostaCorreta: 2,
+                imagem: "./image2.jpg"
+            },
+            {
+                modulo: "Símbolos",
+                curiosidade: "A Árvore de Natal surgiu na Alemanha (séc. XVI). Foi a Rainha Vitória e o Príncipe Alberto que a popularizaram no mundo no séc. XIX.",
+                pergunta: "Qual é o país de origem da tradição da Árvore de Natal?",
+                opcoes: ["França", "Itália", "Alemanha", "EUA"],
+                respostaCorreta: 2,
+                imagem: "./image3.jpg"
+            },
+            {
+                modulo: "Símbolos",
+                curiosidade: "No Vaticano, a tradição da árvore de Natal só chegou à Praça de São Pedro em 1982, por iniciativa do Papa João Paulo II.",
+                pergunta: "Em que ano foi instalada a primeira árvore de Natal na Praça de São Pedro?",
+                opcoes: ["1982", "1850", "1500", "2000"],
+                respostaCorreta: 0,
+                imagem: "./image13.jpg"
+            },
+            {
+                modulo: "Presépio",
+                curiosidade: "Em 1223, São Francisco de Assis criou o primeiro Presépio vivo em Greccio, Itália, para tornar a fé 'palpável'.",
+                pergunta: "Quem criou o primeiro presépio em 1223?",
+                opcoes: ["São Francisco de Assis", "Santo António", "São Nicolau", "Bento XVI"],
+                respostaCorreta: 0,
+                imagem: "./image4.jpg"
+            },
+            {
+                modulo: "Presépio",
+                curiosidade: "O Boi e o Jumento simbolizam que toda a criação, até os animais, reconhece o seu Criador, inspirados numa profecia de Isaías.",
+                pergunta: "O que representam o Boi e o Jumento no presépio?",
+                opcoes: ["Riqueza", "Toda a criação reconhece o Criador", "Transporte", "Frio"],
+                respostaCorreta: 1,
+                imagem: "./image12.jpg"
+            },
+            {
+                modulo: "Tradições",
+                curiosidade: "O Bolo-Rei foi chamado temporariamente de 'Bolo Nacional' em Portugal após a implantação da República em 1910.",
+                pergunta: "Que nome teve o Bolo-Rei após 1910 em Portugal?",
+                opcoes: ["Bolo Republicano", "Bolo do Povo", "Bolo Nacional", "Bolo de Natal"],
+                respostaCorreta: 2,
+                imagem: "./image5.jpg"
+            },
+            {
+                modulo: "Mundo",
+                curiosidade: "A Befana é uma figura italiana que entrega presentes em janeiro. Segundo a lenda cristã, ela procura o Menino Jesus para lhe dar o presente que não deu aos Reis Magos.",
+                pergunta: "Segundo a lenda, porque é que a Befana entrega presentes?",
+                opcoes: ["É avó do Pai Natal", "Procura o Menino Jesus", "Celebra a Primavera", "Perdeu uma aposta"],
+                respostaCorreta: 1,
+                imagem: "./image9.jpg"
+            },
+            {
+                modulo: "Mundo",
+                curiosidade: "No Japão, é tradição comer frango frito da KFC no Natal devido a uma campanha de marketing de 1974.",
+                pergunta: "Qual o prato de Natal famoso no Japão?",
+                opcoes: ["Sushi", "Frango Frito (KFC)", "Ramen", "Pato"],
+                respostaCorreta: 1,
+                imagem: "./image6.jpg"
+            },
+            {
+                modulo: "História",
+                curiosidade: "Na Trégua de Natal de 1914, soldados inimigos pararam de lutar e jogaram futebol na 'terra de ninguém'.",
+                pergunta: "O que aconteceu na Trégua de Natal de 1914?",
+                opcoes: ["Fim da guerra", "Jogaram futebol juntos", "Trocaram tiros", "Assinaram a paz"],
+                respostaCorreta: 1,
+                imagem: "./image10.jpg"
+            }
+        ];
+
+        // --- VARIÁVEIS DE ESTADO ---
+        let currentStep = 0;
+        let score = 0;
+        let gameMode = "";
+        let userName = "";
+        
+        // Flashcards
+        let currentCardIndex = 0;
+        let isFlipped = false;
+
+        // Elementos DOM
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const endScreen = document.getElementById('end-screen');
+        const flashcardScreen = document.getElementById('flashcard-screen');
+        const nameInput = document.getElementById('username');
+        const errorMsg = document.getElementById('error-msg');
+        
+        const mediaModal = document.getElementById('media-modal');
+        const zoomModal = document.getElementById('zoom-modal');
+        const imgModal = document.getElementById('img-in-modal');
+        const captionText = document.getElementById('caption');
+
+        // --- EVENTOS ---
+        document.getElementById('btn-explorer').onclick = () => tryStartGame('explorer');
+        document.getElementById('btn-challenge').onclick = () => tryStartGame('challenge');
+        document.getElementById('btn-flashcards').onclick = () => startFlashcards();
+        
+        document.getElementById('btn-continue').onclick = showQuestion;
+        document.getElementById('btn-next-step').onclick = nextStep;
+
+        // --- FUNÇÕES FLASHCARDS ---
+        function startFlashcards() {
+            if (!validateName()) return;
+            startScreen.classList.add('hidden');
+            flashcardScreen.classList.remove('hidden');
+            currentCardIndex = 0;
+            updateCard();
+        }
+
+        function updateCard() {
+            isFlipped = false;
+            document.getElementById('flashcard').classList.remove('flipped');
+            
+            // Pequeno delay para atualizar texto para não spoilar enquanto desvira
+            setTimeout(() => {
+                const data = flashcardsData[currentCardIndex];
+                document.getElementById('fc-question').textContent = data.q;
+                document.getElementById('fc-answer').textContent = data.a;
+                document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardsData.length}`;
+            }, 200);
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            const card = document.getElementById('flashcard');
+            if(isFlipped) card.classList.add('flipped');
+            else card.classList.remove('flipped');
+        }
+
+        function nextCard() {
+            if (currentCardIndex < flashcardsData.length - 1) {
+                currentCardIndex++;
+                updateCard();
+            }
+        }
+
+        function prevCard() {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                updateCard();
+            }
+        }
+
+        function backToMenu() {
+            flashcardScreen.classList.add('hidden');
+            gameScreen.classList.add('hidden');
+            endScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        }
+
+        // --- FUNÇÕES MULTIMÉDIA GLOBAL ---
+        function openMediaModal() {
+            mediaModal.style.display = "block";
+        }
+
+        function closeMediaModal() {
+            mediaModal.style.display = "none";
+            // Pausar media ao fechar se quiser poupar recursos (opcional, aqui deixo a tocar se o aluno quiser ouvir enquanto joga)
+        }
+
+        // --- FUNÇÕES ZOOM ---
+        function openZoom(img) {
+            zoomModal.style.display = "block";
+            imgModal.src = img.src;
+            captionText.textContent = timelineData[currentStep].curiosidade;
+        }
+
+        function closeZoom() {
+            zoomModal.style.display = "none";
+        }
+
+        // Fechar modais ao clicar fora
+        window.onclick = function(event) {
+            if (event.target == mediaModal) closeMediaModal();
+            if (event.target == zoomModal) closeZoom();
+        }
+
+        // --- LÓGICA DO JOGO ---
+        function validateName() {
+            const name = nameInput.value.trim();
+            if (name === "") {
+                nameInput.classList.add('error');
+                errorMsg.style.display = 'block';
+                return false;
+            }
+            userName = name;
+            return true;
+        }
+
+        function tryStartGame(mode) {
+            if (!validateName()) return;
+            
+            // Pausar media se estiver a tocar no modal global para focar no jogo?
+            // document.getElementById('global-video').pause();
+            // document.getElementById('global-audio').pause();
+            
+            gameMode = mode;
+            score = 0;
+            currentStep = 0;
+            startScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            loadStep();
+        }
+
+        function loadStep() {
+            if (currentStep >= timelineData.length) {
+                endGame();
+                return;
+            }
+
+            const data = timelineData[currentStep];
+            document.getElementById('module-display').textContent = data.modulo;
+            document.getElementById('score-display').textContent = score;
+            document.getElementById('progress-fill').style.width = ((currentStep / timelineData.length) * 100) + "%";
+
+            const img = document.getElementById('step-image');
+            const placeholder = document.getElementById('image-placeholder');
+            img.src = data.imagem;
+            img.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+            img.onerror = function() {
+                this.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+            };
+
+            document.getElementById('curiosity-panel').classList.add('hidden');
+            document.getElementById('question-panel').classList.add('hidden');
+            document.getElementById('curiosity-text').textContent = data.curiosidade;
+            
+            document.getElementById('btn-continue').classList.remove('hidden');
+            document.getElementById('btn-next-step').classList.add('hidden');
+
+            if (gameMode === 'explorer') {
+                document.getElementById('curiosity-panel').classList.remove('hidden');
+            } else {
+                showQuestion();
+            }
+        }
+
+        function showQuestion() {
+            document.getElementById('curiosity-panel').classList.add('hidden');
+            document.getElementById('question-panel').classList.remove('hidden');
+            const data = timelineData[currentStep];
+            document.getElementById('question-text').textContent = data.pergunta;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = "";
+
+            data.opcoes.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn";
+                btn.textContent = opt;
+                btn.onclick = () => handleAnswer(idx, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(idx, btn) {
+            const btns = document.querySelectorAll('.option-btn');
+            btns.forEach(b => b.disabled = true);
+            const data = timelineData[currentStep];
+            
+            if (idx === data.respostaCorreta) {
+                btn.classList.add('correct');
+                score += 10;
+                document.getElementById('score-display').textContent = score;
+                setTimeout(createNextButton, 500);
+            } else {
+                btn.classList.add('wrong');
+                btns[data.respostaCorreta].classList.add('correct');
+                
+                if (gameMode === 'challenge') {
+                    setTimeout(() => {
+                        document.getElementById('question-panel').classList.add('hidden');
+                        document.getElementById('curiosity-panel').classList.remove('hidden');
+                        document.getElementById('btn-continue').classList.add('hidden');
+                        document.getElementById('btn-next-step').classList.remove('hidden');
+                    }, 2000);
+                } else {
+                    setTimeout(createNextButton, 1000);
+                }
+            }
+        }
+
+        function createNextButton() {
+            const container = document.getElementById('options-container');
+            const nextBtn = document.createElement('button');
+            nextBtn.className = "btn";
+            nextBtn.textContent = "Próxima Etapa ➡️";
+            nextBtn.style.width = "100%";
+            nextBtn.style.marginTop = "15px";
+            nextBtn.onclick = nextStep;
+            container.appendChild(nextBtn);
+        }
+
+        function nextStep() {
+            currentStep++;
+            loadStep();
+        }
+
+        function endGame() {
+            gameScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+            const total = timelineData.length * 10;
+            const percent = Math.round((score / total) * 100);
+            
+            let rank = "Aprendiz de Duende";
+            if (percent >= 50) rank = "Ajudante do Pai Natal";
+            if (percent >= 80) rank = "Mestre das Tradições";
+            if (percent === 100) rank = "Lenda do Natal";
+
+            document.getElementById('final-name').textContent = userName;
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('final-rank').textContent = rank;
+            document.getElementById('final-date').textContent = "Data: " + new Date().toLocaleDateString('pt-PT');
+        }
+
+        nameInput.oninput = function() {
+            this.classList.remove('error');
+            errorMsg.style.display = 'none';
+        };
+    </script>
+</body>
+</html>
